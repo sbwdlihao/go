@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 	"time"
+	"errors"
 )
 
 // wrong usage, test will exit with status 2
@@ -54,6 +55,25 @@ func TestChannel5(t *testing.T)  {
 	close(c)
 	fmt.Printf("%T", <-c)
 	fmt.Println(<-c)
+}
+
+// 往一个已经关闭的channel中写入会导致panic
+func TestChannel5_1(t *testing.T)  {
+	c := make(chan string)
+	close(c)
+	c <- "hello" // panic: send on closed channel
+}
+
+func TestChannel5_2(t *testing.T)  {
+	c := make(chan string)
+	s, ok := <-c
+	fmt.Println(s, ok) // 会阻塞
+}
+
+func TestChannel5_3(t *testing.T)  {
+	c := make(chan string, 1)
+	s, ok := <-c
+	fmt.Println(s, ok) // 也会阻塞
 }
 
 func TestChannel6(t *testing.T) {
@@ -179,4 +199,53 @@ func TestChannel9(t *testing.T) {
 	done <- struct {}{}
 	time.Sleep(1 * time.Second)
 	fmt.Println("main thread quit")
+}
+
+func TestChannel10(t *testing.T)  {
+	done := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-done:
+				fmt.Println("return")
+				return
+			}
+			time.Sleep(time.Second)
+			fmt.Println("still in for")
+		}
+	}()
+
+	time.Sleep(3 * time.Second)
+	done <- struct {}{}
+}
+
+func TestChannel11(t *testing.T)  {
+	fn := func() chan error {
+		r := make(chan error)
+		go func() {
+			time.Sleep(1 * time.Second)
+			r <- errors.New("hello")
+			close(r)
+		}()
+		return r
+	}
+
+	done := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case err:= <-fn():
+				if err != nil {
+					fmt.Println(err)
+				}
+			case <-done:
+				fmt.Println("done")
+				return
+			}
+		}
+	} ()
+
+	time.Sleep(5 * time.Second)
+
+	done <- struct {}{}
 }

@@ -11,7 +11,7 @@ type template struct {
 	CoinbaseValue int64 `json:"coinbasevalue,omitempty"`
 }
 
-func Test0(t *testing.T) {
+func TestJson0(t *testing.T) {
 	t0 := template{
 		CoinbaseValue: 5000017380,
 	}
@@ -28,5 +28,18 @@ func Test0(t *testing.T) {
 		os.Exit(1)
 	}
 	fmt.Println(t1.CoinbaseValue)
+}
+
+func TestJson1(t *testing.T)  {
+	m := map[string]string{
+		"a": "da",
+		"b": "d",
+	}
+	mb, _ := json.Marshal(m)
+
+	var mc map[string]string
+	//mc := make(map[string]string) 这样写也可以
+	json.Unmarshal(mb, &mc)
+	fmt.Println(mc)
 }
 
