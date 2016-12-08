@@ -24,6 +24,8 @@ func TestVar0(t *testing.T) {
 }
 
 func TestVar1(t *testing.T) {
-	one := [32]byte{1} // [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
-	fmt.Println(one)
+	var a int = 3
+	var b *int = &a
+	var c int = *b
+	fmt.Println(a, b, c) // 3 0xc4200106b8 3
 }

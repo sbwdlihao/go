@@ -249,3 +249,47 @@ func TestChannel11(t *testing.T)  {
 
 	done <- struct {}{}
 }
+
+// 测试子线程非常耗时的操作，并在主线程中释放资源
+// 测试说明主线程结束后，子线程也会被终止
+func TestChannel12(t *testing.T)  {
+	arr := [1]byte{0}
+
+	arrp := &arr
+
+	fn := func() chan byte {
+		r := make(chan byte)
+		go func() {
+			// 模拟耗时操作
+			fmt.Println("模拟耗时操作 start")
+			time.Sleep(3  * time.Second)
+			fmt.Println("模拟耗时操作 end")
+			r <- arrp[0]
+			close(r)
+		}()
+		return r
+	}
+	done := make(chan struct{})
+	go func() {
+
+		for {
+			select {
+			case b := <-fn():
+				fmt.Println(b)
+			case <-done:
+				fmt.Println("done")
+				return
+			}
+		}
+	}()
+
+	time.Sleep(1 * time.Second)
+
+	arrp = nil
+
+	done <- struct {}{}
+
+	// 程序输出
+	// 模拟耗时操作 start
+	// done
+}

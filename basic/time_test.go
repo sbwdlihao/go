@@ -144,3 +144,11 @@ func TestTime4(t *testing.T)  {
 	<-done
 	ticker_done <- struct {}{}
 }
+
+func TestTime5(t *testing.T) {
+	now := time.Now()
+	last := now.Add(-time.Second)
+	fmt.Println(now.Add(-time.Second).Before(last)) // false
+	fmt.Println(now.Add(-2 * time.Second).Before(last)) // true
+	fmt.Println(now.Sub(last).Seconds()) // 1
+}
