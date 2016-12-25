@@ -11,5 +11,7 @@ func TestCrypto0(t *testing.T) {
 	h.Write([]byte{0,1,2})
 	data := h.Sum(nil)
 	fmt.Println(data)
+
+	fmt.Println(sha3.Sum256(nil))
 }
 
