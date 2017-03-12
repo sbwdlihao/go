@@ -43,3 +43,19 @@ func TestJson1(t *testing.T)  {
 	fmt.Println(mc)
 }
 
+func TestString(t *testing.T) {
+	var s string
+	s = "7f6"
+	b, _ := json.Marshal(s)
+	fmt.Println(b) // [34 55 102 54 34]
+	var s1 string
+	json.Unmarshal(b, &s1)
+	fmt.Println(s1) // 7f6
+	parseString(&s1) // abd
+	fmt.Println(s1)
+}
+
+func parseString(v interface{})  {
+	json.Unmarshal([]byte{34, 97, 98, 100, 34}, v)
+}
+
